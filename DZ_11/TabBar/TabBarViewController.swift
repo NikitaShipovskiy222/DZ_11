@@ -8,14 +8,21 @@
 import UIKit
 
 final class TabBarViewController: UITabBarController {
-
-        
+    
+    private let customTabBar = CustomTabBar()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        
+        setValue(customTabBar, forKey: "tabBar")
         setupTabItems()
+        //   navigationItem.hidesBackButton = true
+        
+        
     }
+    
+    
     
     private func setupTabItems() {
         
@@ -34,14 +41,15 @@ final class TabBarViewController: UITabBarController {
         profileVc.tabBarItem.image = UIImage(systemName: "person.crop.circle")
         profileVc.tabBarItem.selectedImage = UIImage(systemName: "person.crop.circle.fill")
         
-    
+        let nev1 = UINavigationController(rootViewController: mainVc)
+        let nev2 = UINavigationController(rootViewController: messengeVC)
+        let nev3 = UINavigationController(rootViewController: profileVc)
         
+        setViewControllers([nev1, nev2, nev3], animated: false)
         
-        
-        setViewControllers([mainVc, messengeVC, profileVc], animated: false)
         
     }
+    
 
-
+    
 }
-

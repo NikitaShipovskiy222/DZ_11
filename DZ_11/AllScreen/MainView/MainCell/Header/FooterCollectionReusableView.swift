@@ -14,7 +14,7 @@ final class FooterCollectionReusableView: UICollectionReusableView {
     private lazy var footerTitle: UILabel = {
         $0.translatesAutoresizingMaskIntoConstraints = false
         $0.font = UIFont.systemFont(ofSize: 12, weight: .light)
-        $0.textColor = .lightGray
+        $0.textColor = .gray
         $0.numberOfLines = 0
         return $0
     }(UILabel())

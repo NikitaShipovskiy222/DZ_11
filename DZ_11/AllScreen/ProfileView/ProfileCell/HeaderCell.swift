@@ -7,17 +7,16 @@
 
 import UIKit
 
-final class MainHeaderCollectionReusableCell: UICollectionReusableView {
+final class HeaderCell: UICollectionReusableView {
     
-    static let reuseId: String = "MainHeaderCollectionReusableCell"
+    static let reuseId: String = "HeaderCollectionReusableCell"
     
     private lazy var hStack: UIStackView = {
         .config(view: $0) { stack in
             stack.axis = .horizontal
-            stack.alignment = .center
+            stack.alignment = .leading
             stack.distribution = .equalSpacing
             stack.addArrangedSubview(self.headerTitle)
-            stack.addArrangedSubview(self.headerButton)
         }
     }(UIStackView())
     
@@ -28,12 +27,10 @@ final class MainHeaderCollectionReusableCell: UICollectionReusableView {
         return $0
     }(UILabel())
     
-    private lazy var headerButton: UIButton = {
-        $0.setImage(UIImage(named: "listdz"), for: .normal)
-        return $0
-    }(UIButton())
+
     
-    func getHeader(header: String){
+    
+    func getProfileHeader(header: String){
         addSubview(hStack)
         headerTitle.text = header
         makeConstraint()

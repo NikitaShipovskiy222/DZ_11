@@ -9,16 +9,21 @@ import UIKit
 
 class MainViewController: UIViewController {
     
+    
+    
     private let item = ModelSection.mockData()
+    
     
     lazy var mainCollection: UICollectionView = {
         $0.register(BannerCollectionViewCell.self, forCellWithReuseIdentifier: BannerCollectionViewCell.reuseId)
         $0.register(EventCollectionViewCell.self, forCellWithReuseIdentifier: EventCollectionViewCell.reuseId)
        $0.register(UsersCollectionViewCell.self, forCellWithReuseIdentifier: UsersCollectionViewCell.reuseId)
         $0.register(MainHeaderCollectionReusableCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: MainHeaderCollectionReusableCell.reuseId)
+        $0.register(HeaderCollectionReusableCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderCollectionReusableCell.reuseId)
         $0.register(FooterCollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: FooterCollectionReusableView.reuseId)
         $0.dataSource = self
         $0.delegate = self
+        $0.backgroundColor = UIColor(named: "background")
         return $0
     }(UICollectionView(frame: view.frame, collectionViewLayout: getLayout()))
     
@@ -58,14 +63,18 @@ class MainViewController: UIViewController {
         let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1)
                                               , heightDimension: .fractionalHeight(1))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 7, trailing: 0)
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.8),
-                                               heightDimension: .absolute(60))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, repeatingSubitem: item, count: 2)
+                                               heightDimension: .absolute(59))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, repeatingSubitem: item, count: 3)
+        group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0 , bottom: 0, trailing: 15)
         
         let section = NSCollectionLayoutSection(group: group)
-        section.orthogonalScrollingBehavior = .groupPagingCentered
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 30, bottom: 40, trailing: 30)
+        section.orthogonalScrollingBehavior = .continuous
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 30, bottom: 100, trailing: 30)
+        section.boundarySupplementaryItems = [self.createHeaderSize(), self.createFooterSize()]
+
         return section
     }
     
@@ -76,13 +85,16 @@ class MainViewController: UIViewController {
                                               , heightDimension: .fractionalHeight(1))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.8),
-                                               heightDimension: .absolute(60))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, repeatingSubitem: item, count: 2)
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5),
+                                               heightDimension: .absolute(173))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, repeatingSubitem: item, count: 1)
+        group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0 , bottom: 0, trailing: 20)
+        
         
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPagingCentered
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 30, bottom: 40, trailing: 30)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 30, bottom: 60, trailing: 30)
+        section.boundarySupplementaryItems = [self.createHeaderSize(), self.createFooterSize()]
         return section
     }
     
@@ -104,11 +116,16 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(mainCollection)
-        view.backgroundColor = .white
+        
     }
 }
 
 extension MainViewController: UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        item.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         item[section].item.count
     }
@@ -139,19 +156,35 @@ extension MainViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         let items = item[indexPath.section]
-    
-        switch kind {
-            
-        case UICollectionView.elementKindSectionHeader:
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: MainHeaderCollectionReusableCell.reuseId, for: indexPath) as? MainHeaderCollectionReusableCell else {return UICollectionReusableView()}
-            header.getHeader(header: items.header)
-            return header
-            
+        
+        switch indexPath.section{
+        case 0:
+            switch kind {
+                
+            case UICollectionView.elementKindSectionHeader:
+                guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: MainHeaderCollectionReusableCell.reuseId, for: indexPath) as? MainHeaderCollectionReusableCell else {return UICollectionReusableView()}
+                header.getHeader(header: items.header, headerButton: items.headerButton)
+                return header
+                
+            default:
+                guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: FooterCollectionReusableView.reuseId, for: indexPath) as? FooterCollectionReusableView else {return UICollectionReusableView()}
+                header.getFooter(footerText: items.footerText)
+                return header
+            }
         default:
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: FooterCollectionReusableView.reuseId, for: indexPath) as? FooterCollectionReusableView else {return UICollectionReusableView()}
-            header.getFooter(footerText: items.footerText)
-            return header
+            switch kind {
+            case UICollectionView.elementKindSectionHeader:
+                guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderCollectionReusableCell.reuseId, for: indexPath) as? HeaderCollectionReusableCell else {return UICollectionReusableView()}
+                header.getHeader(header: items.header, headerButton: items.headerButton)
+                return header
+                
+            default:
+                guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: FooterCollectionReusableView.reuseId, for: indexPath) as? FooterCollectionReusableView else {return UICollectionReusableView()}
+                header.getFooter(footerText: items.footerText)
+                return header
+                
+            }
+            
         }
     }
-    
 }
